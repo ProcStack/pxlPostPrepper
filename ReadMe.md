@@ -4,11 +4,20 @@ This project is a work-in-progress.
 
 ### Current Functionality
 
-#### pxlPostPrepper.py / pxlPostPrepper.exe
+![pxlPostPrepper Window](_show/pxlPostPrepper_v0-0-1.webp)
+
+ - Find a Windows build in `Releases`
+ - To run from Terminal / Command Prompt, you'll need PyQT6
+ - Written in Python 3.10.6
 
 
-### WIP
-I'm leaving the info below for when the posting scripts work
+### Pyinstaller
+If you feel like building the exe, using `pyinstaller` -
+`pyinstaller --onefile --windowed --icon=Icon.ico --add-data="Icon.ico;."  pxlPostPrepper.py`
+
+
+### Work-In-Progress
+I'm leaving the info below for when the auto-posting scripts work
 
 XXX
 

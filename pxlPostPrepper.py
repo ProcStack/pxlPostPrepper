@@ -13,6 +13,8 @@ from PyQt6.QtGui import QPixmap, QIcon
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QMessageBox
 
+pxlPostPrepperVersion = "0.0.1"
+
 def resource_path(relative_path):
     # When running from a PyInstaller bundle, data files are unpacked to _MEIPASS
     if getattr(sys, "frozen", False):
@@ -25,11 +27,13 @@ class pxlPostPrepper(QWidget):
     def __init__(self):
         super().__init__()
 
-        self.setWindowTitle("Social Media Post Prepper")
+        self.setWindowTitle("Social Media Prepping Tool :: pxlPostPrepper v" + pxlPostPrepperVersion)
         self.setGeometry(100, 100, 1000, 600)
         icon_path = resource_path("Icon.ico")
         if os.path.exists(icon_path):
             self.setWindowIcon(QIcon(icon_path))
+
+        self.active_preview_filepath = ""
 
         # Main layout
         main_v = QVBoxLayout(self)
@@ -40,15 +44,18 @@ class pxlPostPrepper(QWidget):
         # Left Sidebar
         sidebar = QVBoxLayout()
         sidebar.addWidget(QLabel("Access Token"))
-        self.access_token = QLineEdit()
+        self.access_token = QLineEdit('---')
         sidebar.addWidget(self.access_token)
+        self.access_token.setDisabled(True)
 
         sidebar.addWidget(QLabel("Instagram Account ID"))
-        self.ig_account_id = QLineEdit()
+        self.ig_account_id = QLineEdit('---')
         sidebar.addWidget(self.ig_account_id)
+        self.ig_account_id.setDisabled(True)
 
         save_env_btn = QPushButton("Save .env")
         sidebar.addWidget(save_env_btn)
+        save_env_btn.setDisabled(True)
 
         #sideBarSpacer = QWidget()
         #sideBarSpacer.setSizePolicy(QSizePolicy.Policy.Preferred, QSizePolicy.Policy.Expanding)
@@ -131,10 +138,10 @@ class pxlPostPrepper(QWidget):
         self.caption_edit.setFixedHeight(80)
         meta_layout.addWidget(self.caption_edit)
 
-        meta_layout.addWidget(QLabel("Scheduled Time (optional)"))
-        self.scheduled = QDateTimeEdit()
-        self.scheduled.setCalendarPopup(True)
-        meta_layout.addWidget(self.scheduled)
+        #meta_layout.addWidget(QLabel("Scheduled Time (optional)"))
+        #self.scheduled = QDateTimeEdit()
+        #self.scheduled.setCalendarPopup(True)
+        #meta_layout.addWidget(self.scheduled)
 
         # Stats display
         self.stats_label = QLabel("Resolution: - \nAspect Ratio: -")
@@ -199,6 +206,10 @@ class pxlPostPrepper(QWidget):
         self.preview_filename.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.preview_filename.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
         imgDetails_hlayout.addWidget(self.preview_filename)
+
+        copy_imagePath_btn = QPushButton("Copy Image Path")
+        imgDetails_hlayout.addWidget(copy_imagePath_btn)
+        copy_imagePath_btn.clicked.connect(lambda: QApplication.clipboard().setText(self.active_preview_filepath))
 
         copy_imageData_btn = QPushButton("Copy Image Data")
         imgDetails_hlayout.addWidget(copy_imageData_btn)
@@ -341,6 +352,7 @@ class pxlPostPrepper(QWidget):
         filename_dispArr = file_path.split(delimiter)
         filename_dispStr = delimiter.join(filename_dispArr[-3::])
         self.preview_filename.setText(filename_dispStr)
+        self.active_preview_filepath = file_path
 
     def _update_preview_scaled(self):
         """Scale the stored original pixmap to fit the preview widget, capped at 1080x1350.
@@ -857,16 +869,13 @@ class pxlPostPrepper(QWidget):
                 widget.setParent(None)
 
         for idx, post in enumerate(self.posts):
-            # prefer local name if present
             local = post.get('local_data', {}) or {}
             name = local.get('post_name') or ''
             if name:
                 title = name
             else:
                 title = f"Post {idx+1}"
-            #btn = QPushButton(f"{title}\n{(post.get('caption') or '')[:20]}")
             btn = QPushButton(f"{idx+1} : {title}")
-            # prevent button clicks from stealing focus and causing scroll jumps
             try:
                 btn.setFocusPolicy(Qt.FocusPolicy.NoFocus)
             except Exception:
@@ -876,17 +885,22 @@ class pxlPostPrepper(QWidget):
                 btn.setDefault(False)
             except Exception:
                 pass
-            #btn.setFixedSize(185, 40)
             btn.setFixedHeight(40)
             btn.setSizePolicy(QSizePolicy.Policy.Expanding, QSizePolicy.Policy.Fixed)
             btn.clicked.connect(lambda checked, i=idx: self.load_post(i))
-            # color button dark green if post is marked as posted
-            try:
-                posted = bool(post.get('local_data', {}).get('has_posted'))
-                if posted:
-                    btn.setStyleSheet('background-color: #0b6623; color: white;')
-            except Exception:
-                pass
+
+            # Determine background color based on selection and posted state
+            is_selected = (self.current_index == idx)
+            posted = bool(local.get('has_posted'))
+            if is_selected and posted:
+                btn.setStyleSheet('background-color: #96b596; color: black; font-weight: bold;')
+            elif is_selected:
+                btn.setStyleSheet('background-color: #707070; font-weight: bold;')
+            elif posted:
+                btn.setStyleSheet('background-color: #6eac6f; color: black;')
+            else:
+                # Default
+                btn.setStyleSheet('')
             self.post_bar_layout.addWidget(btn)
 
         # spacer to push items left
@@ -964,6 +978,7 @@ class pxlPostPrepper(QWidget):
             # refresh the media details pane
             self.selected_media_index = 0
             self.refresh_media_details()
+        """
         sched = post.get('scheduled_time')
         if sched:
             try:
@@ -971,6 +986,7 @@ class pxlPostPrepper(QWidget):
                 self.scheduled.setDateTime(dt)
             except Exception:
                 pass
+        """
         # update posted checkbox to reflect this post's state (do after details refresh)
         try:
             if hasattr(self, 'posted_checkbox'):
@@ -1015,6 +1031,7 @@ class pxlPostPrepper(QWidget):
             self.current_index = None
             self.preview.setText('Drop an image here')
             self.preview_filename.setText('-- Load an image --')
+            self.active_preview_filepath = ""
             self.caption_edit.clear()
             # clear media details
             self.selected_media_index = None
@@ -1038,6 +1055,7 @@ class pxlPostPrepper(QWidget):
         if self.current_index is not None:
             cur = self.posts[self.current_index]
             cur['caption'] = self.caption_edit.toPlainText()
+            """
             dt = self.scheduled.dateTime()
             if dt:
                 try:
@@ -1045,7 +1063,7 @@ class pxlPostPrepper(QWidget):
                     cur['scheduled_time'] = iso
                 except Exception:
                     cur['scheduled_time'] = None
-
+            """
         # Ask where to save
         fn, _ = QFileDialog.getSaveFileName(self, 'Save posts to JSON', 'projectDataStruct.json', 'JSON Files (*.json)')
         if not fn:
