@@ -6,6 +6,15 @@ This project is a work-in-progress.
 
 ![pxlPostPrepper Window](_show/pxlPostPrepper_v0-0-1.webp)
 
+ - Load Directories or multiple selected images to load as individual posts
+ - Combine posts as needed
+ - Add Comment, Alt Test, Live URL data per Post and Media
+ - Save & Load your project as a JSON file to your computer
+ - Mark `Has Posted` to colored a post Green
+ - If you are randomly posting, like me, hit `Select Random Post` or `Select Random Un-Posted`
+
+<br/>
+<br/>
  - Find a Windows build in `Releases`
  - To run from Terminal / Command Prompt, you'll need PyQT6
  - Written in Python 3.10.6
@@ -13,7 +22,7 @@ This project is a work-in-progress.
 
 ### Pyinstaller
 If you feel like building the exe, using `pyinstaller` -
-`pyinstaller --onefile --windowed --icon=Icon.ico --add-data="Icon.ico;."  pxlPostPrepper.py`
+<br/>`pyinstaller --onefile --windowed --icon=Icon.ico --add-data="Icon.ico;."  pxlPostPrepper.py`
 
 
 ### Work-In-Progress
