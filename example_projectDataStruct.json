@@ -1,0 +1,68 @@
+{
+  "local_data": {
+    "post_name": "Cave Exploration",
+    "has_posted": false,
+    "date_modified": "2025-08-20T14:30:00",
+    "keywords": ["caves", "exploration", "Wisp"]
+  },
+  "post_kind": "carousel",
+  "caption": "Exploring the caves with Wisp! #FrayedFables #GameDev",
+  "media": [
+    {
+      "file_path": "images/post1.jpg",
+      "URL": "https://example.com/images/post1.jpg",
+      "type": "image",
+      "description": "Per-image description. This text can be used for image-specific overlays or as a child caption.",
+      "alt_text": "Screenshot of cave exploration with Wisp character",
+      "user_tags": [
+        {
+          "username": "teammate_username",
+          "x": 0.5,
+          "y": 0.8
+        }
+      ],
+      "location": {
+        "id": null,
+        "name": null
+      },
+      "image_processing": {
+        "resize": null,
+        "filter": null,
+        "auto_enhance": false
+      }
+    },
+    {
+      "file_path": "images/post2.mp4",
+      "URL": "https://example.com/images/post2.mp4",
+      "type": "video",
+      "description": "Short gameplay clip showing the cave entrance",
+      "alt_text": "Gameplay video of character entering a cave",
+      "user_tags": [],
+      "location": {
+        "id": null,
+        "name": null
+      },
+      "video_processing": {
+        "trim": {
+          "start_seconds": 0,
+          "end_seconds": null
+        },
+        "thumbnail_path": null,
+        "mute": false
+      }
+    }
+  ],
+  "scheduled_time": "2025-08-20T14:30:00",
+  "post_options": {
+    "allow_comments": true,
+    "disable_reshare": false,
+    "audience": "PUBLIC",
+    "share_to_fb": false
+  },
+  "api_notes": {
+    "per_media_caption": "partial - Instagram Graph API requires creating child media containers for carousel items; some SDKs accept child captions but final post caption is often the main caption.",
+    "user_tags": "supported - can be passed per media when creating media containers (use user id where possible).",
+    "alt_text": "supported - Graph API accepts alt_text (accessibility_caption) on media containers.",
+    "location": "supported - use a location id when creating media containers."
+  }
+}
